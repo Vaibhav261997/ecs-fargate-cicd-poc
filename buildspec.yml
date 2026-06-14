@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 501264524898.dkr.ecr.ap-south-1.amazonaws.com
+
+  build:
+    commands:
+      - docker build -t nginx-poc .
+      - docker tag nginx-poc:latest 501264524898.dkr.ecr.ap-south-1.amazonaws.com/nginx-poc:latest
+
+  post_build:
+    commands:
+      - docker push 501264524898.dkr.ecr.ap-south-1.amazonaws.com/nginx-poc:latest
+      - printf '[{"name":"nginx-container","imageUri":"501264524898.dkr.ecr.ap-south-1.amazonaws.com/nginx-poc:latest"}]' > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
